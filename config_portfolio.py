@@ -131,7 +131,7 @@ size_neu, size_neu_ma = len(src_signal_ids_neu), len(src_signal_ids_neu_ma)
 
 trn_win, lbd = 3, 20  # optimized
 # trn_win, lbd = 1, 20  # test
-min_model_days = int(trn_win * 21 * 0.9)
+min_model_days = int(trn_win * 20 * 0.9)
 test_portfolio_ids = [
     "raw_fix",
     "neu_fix",
