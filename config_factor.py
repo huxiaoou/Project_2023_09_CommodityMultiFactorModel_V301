@@ -21,6 +21,7 @@ def gen_factor_series_H_LD(factor: str, factor_setting: dict) -> list[tuple[str,
 wins_aver = (10, 20, 60, 120, 180, 240)
 wins_break = (10, 20, 60, 120, 180, 240)
 wins_lag = (20, 60, 240)
+wins_lag_month = (24, 66, 250)
 wins_full_term = (10, 20, 60, 120, 180, 240)
 wins_quad_term = (60, 120, 180, 240)
 factors_settings = {
@@ -52,7 +53,7 @@ factors_settings = {
 
     "VAL": {"H": wins_quad_term, "LD": wins_lag},
     "CBETA": {"H": wins_quad_term, "LD": wins_lag},
-    "IBETA": {"H": wins_quad_term, "LD": wins_lag},
+    "IBETA": {"H": wins_quad_term, "LD": wins_lag_month},
 
     "MACD": {"F": (10,), "S": (20,), "ALPHA": (0.2,)},
     "KDJ": {"N": (10, 20)},

@@ -263,7 +263,7 @@ if __name__ == "__main__":
             agent_factor = CMpFactorWithArgWin(proc_num, factor, factors_settings[factor]["H"], run_mode, bgn_date, stp_date)
             agent_factor.mp_cal_factor(futures_by_instrument_dir=futures_by_instrument_dir, major_return_db_name=major_return_db_name, **shared_keywords)
             src_factor_ids = [f"{factor}{_:03d}" for _ in factors_settings[factor]["H"]]
-            direction = factors_transformation_directions.get(("RVOL", "LD"), 1)
+            direction = factors_transformation_directions.get((factor, "LD"), 1)
             agent_transformer = CMpTransformer(proc_num, src_factor_ids, "LD", factors_settings[factor]["LD"], direction, factors_exposure_raw_dir,
                                                run_mode, bgn_date, stp_date, factor)
             agent_transformer.mp_cal_transform(**shared_keywords)
@@ -328,58 +328,67 @@ if __name__ == "__main__":
             factors_exposure_raw_dir=factors_exposure_raw_dir,
             factors_exposure_neu_dir=factors_exposure_neu_dir,
             calendar=calendar, )
-    # elif switch in ["IC"]:
-    #     from ic_tests.ic_tests_cls import cal_ic_tests_mp
-    #
-    #     cal_ic_tests_mp(
-    #         proc_num=proc_num, factors=factors,
-    #         ic_tests_dir=ic_tests_dir,
-    #         available_universe_dir=available_universe_dir,
-    #         exposure_dir=factors_exposure_dir,
-    #         test_return_dir=test_return_dir,
-    #         calendar=calendar,
-    #         run_mode=run_mode, bgn_date=bgn_date, stp_date=stp_date,
-    #         neutral_method=None,
-    #     )
-    # elif switch in ["ICN"]:
-    #     from ic_tests.ic_tests_cls import cal_ic_tests_mp
-    #
-    #     cal_ic_tests_mp(
-    #         proc_num=proc_num, factors=factors,
-    #         ic_tests_dir=ic_tests_dir,
-    #         available_universe_dir=available_universe_dir,
-    #         exposure_dir=factors_exposure_neutral_dir,
-    #         test_return_dir=test_return_dir,
-    #         calendar=calendar,
-    #         run_mode=run_mode, bgn_date=bgn_date, stp_date=stp_date,
-    #         neutral_method=neutral_method,
-    #     )
-    # elif switch in ["ICS"]:
-    #     from ic_tests.ic_tests_cls_summary import CICTestsSummaryRaw
-    #
-    #     agent_summary = CICTestsSummaryRaw(
-    #         proc_num=proc_num, ic_tests_dir=ic_tests_dir,
-    #         ic_tests_summary_dir=ic_tests_summary_dir,
-    #     )
-    #     agent_summary.get_summary_mp(factors, factors_classification)
-    #     agent_summary.get_cumsum_mp(factors_group)
-    #     agent_summary.plot_selected_factors_cumsum(selected_raw_factors)
-    # elif switch in ["ICNS"]:
-    #     from ic_tests.ic_tests_cls_summary import CICTestsSummaryNeu
-    #
-    #     agent_summary = CICTestsSummaryNeu(
-    #         neutral_method=neutral_method,
-    #         proc_num=proc_num, ic_tests_dir=ic_tests_dir,
-    #         ic_tests_summary_dir=ic_tests_summary_dir,
-    #     )
-    #     agent_summary.get_summary_mp(factors, factors_classification)
-    #     agent_summary.get_cumsum_mp(factors_group)
-    #     agent_summary.plot_selected_factors_cumsum(selected_neu_factors)
-    #
-    # elif switch in ["ICC"]:
-    #     from ic_tests.ic_tests_cls_summary import cal_ic_tests_comparison
-    #
-    #     cal_ic_tests_comparison(neutral_method, ic_tests_summary_dir)
+    elif switch in ["IC"]:
+        from config_factor import factors_raw
+        from setup_project import ic_tests_dir, available_universe_dir, factors_exposure_raw_dir, test_return_dir
+        from ic_tests.ic_tests_cls import cal_ic_tests_mp
+
+        cal_ic_tests_mp(
+            proc_num=proc_num, factors=factors_raw,
+            ic_tests_dir=ic_tests_dir,
+            available_universe_dir=available_universe_dir,
+            exposure_dir=factors_exposure_raw_dir,
+            test_return_dir=test_return_dir,
+            calendar=calendar,
+            run_mode=run_mode, bgn_date=bgn_date, stp_date=stp_date,
+            neutral_tag="RAW"
+        )
+    elif switch in ["ICN"]:
+        from config_factor import factors_raw
+        from setup_project import ic_tests_dir, available_universe_dir, factors_exposure_neu_dir, test_return_dir
+        from ic_tests.ic_tests_cls import cal_ic_tests_mp
+
+        cal_ic_tests_mp(
+            proc_num=proc_num, factors=factors_raw,
+            ic_tests_dir=ic_tests_dir,
+            available_universe_dir=available_universe_dir,
+            exposure_dir=factors_exposure_neu_dir,
+            test_return_dir=test_return_dir,
+            calendar=calendar,
+            run_mode=run_mode, bgn_date=bgn_date, stp_date=stp_date,
+            neutral_tag="NEU",
+        )
+    elif switch in ["ICS"]:
+        from config_factor import factors_raw, factors_classification, factors_group
+        from config_portfolio import selected_raw_factors
+        from setup_project import ic_tests_dir, ic_tests_summary_dir
+        from ic_tests.ic_tests_cls_summary import CICTestsSummary
+
+        agent_summary = CICTestsSummary(
+            proc_num=proc_num, ic_tests_dir=ic_tests_dir,
+            ic_tests_summary_dir=ic_tests_summary_dir, neutral_tag="RAW",
+        )
+        agent_summary.get_summary_mp(factors_raw, factors_classification)
+        agent_summary.get_cumsum_mp(factors_group)
+        agent_summary.plot_selected_factors_cumsum(selected_raw_factors)
+    elif switch in ["ICNS"]:
+        from config_factor import factors_raw, factors_classification, factors_group
+        from config_portfolio import selected_neu_factors
+        from setup_project import ic_tests_dir, ic_tests_summary_dir
+        from ic_tests.ic_tests_cls_summary import CICTestsSummary
+
+        agent_summary = CICTestsSummary(
+            proc_num=proc_num, ic_tests_dir=ic_tests_dir,
+            ic_tests_summary_dir=ic_tests_summary_dir, neutral_tag="NEU",
+        )
+        agent_summary.get_summary_mp(factors_raw, factors_classification)
+        agent_summary.get_cumsum_mp(factors_group)
+        agent_summary.plot_selected_factors_cumsum(selected_neu_factors)
+    elif switch in ["ICC"]:
+        from setup_project import ic_tests_summary_dir
+        from ic_tests.ic_tests_cls_summary import cal_ic_tests_comparison
+
+        cal_ic_tests_comparison(ic_tests_summary_dir)
     # elif switch in ["FECOR"]:
     #     from factors.factors_exposure_corr import cal_factors_exposure_corr
     #

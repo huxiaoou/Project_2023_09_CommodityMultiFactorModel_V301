@@ -10,7 +10,7 @@ selected_raw_factors = (
     "BETA020",
     "VOL020",
     "RSI010",
-    "IBETA240LD020",
+    "IBETA240LD024",
     "NETDOIBD020",
     "SIZEBR010",
     "RVOL010LD020",
