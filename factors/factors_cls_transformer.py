@@ -203,3 +203,29 @@ class CMpTransformer(object):
         print(f"... transformation:{SetFontGreen(self.transform_type)} of {SetFontGreen(self.tag)} accomplished")
         print(f"... total time consuming: {SetFontGreen(f'{(t1 - t0).total_seconds():.2f}')} seconds")
         return 0
+
+
+def apply_transformations(proc_num: int, factor: str, transform_types: list[str],
+                          factors_settings: dict, factors_transformation_directions: dict,
+                          factors_exposure_dir: str,
+                          run_mode: str, bgn_date: str, stp_date: str, **shared_keywords):
+    mapper_trans_type_to_key = {
+        "SUM": "S",
+        "SHARPE": "SP",
+        "AVER": "A",
+        "BR": "BR",
+        "LR": "LR",
+        "BD": "BD",
+        "LD": "LD",
+    }
+    default_direction = 1
+    for transform_type in transform_types:
+        trans_key = mapper_trans_type_to_key[transform_type]
+        arg_wins = factors_settings[factor][trans_key]
+        direction = factors_transformation_directions.get((factor, trans_key), default_direction)
+        agent_transformer = CMpTransformer(proc_num=proc_num, src_factor_ids=[factor],
+                                           transform_type=transform_type, arg_wins=arg_wins,
+                                           direction=direction, src_factor_dir=factors_exposure_dir,
+                                           run_mode=run_mode, bgn_date=bgn_date, stp_date=stp_date, tag=factor)
+        agent_transformer.mp_cal_transform(**shared_keywords)
+    return 0

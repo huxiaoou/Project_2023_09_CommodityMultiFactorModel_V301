@@ -59,6 +59,16 @@ factors_settings = {
     "RSI": {"N": (10, 20)},
 }
 
+factors_transformation_directions = {
+    ("MTM", "S"): -1,
+    ("MTM", "SP"): -1,
+    ("SIZE", "BR"): -1,
+    ("SIZE", "LR"): -1,
+    ("RS", "BR"): -1,
+    ("RS", "LR"): -1,
+    ("RVOL", "LD"): -1,
+}
+
 factors_mtm = gen_factor_series("MTM", factors_settings["MTM"], True)
 factors_size = gen_factor_series("SIZE", factors_settings["SIZE"], True)
 factors_oi = gen_factor_series("OI", factors_settings["OI"], True)
