@@ -9,11 +9,11 @@ from skyrim.falkreath import CManagerLibReader, CManagerLibWriter
 
 
 def neutralize_one_factor_one_day(
-        df: pd.DataFrame, mother_df: pd.DataFrame, neutral_method: str,
+        df: pd.DataFrame, mother_df: pd.DataFrame,
         weight_id: str, sector_df: pd.DataFrame) -> pd.Series:
     xdf = pd.merge(left=mother_df, right=df, on="instrument", how="inner").set_index("instrument")
     xdf["value_norm"] = transform_dist(t_exposure_srs=xdf["value"])
-    xdf["rel_wgt"] = np.sqrt(xdf[weight_id]) if neutral_method == "WS" else 1
+    xdf["rel_wgt"] = np.sqrt(xdf[weight_id])
     factor_neutral_srs = neutralize_by_sector(
         t_raw_data=xdf["value_norm"],
         t_sector_df=sector_df,
@@ -22,16 +22,16 @@ def neutralize_one_factor_one_day(
     return factor_neutral_srs
 
 
-def neutralize_one_factor(src_factor: str, neutral_method: str,
+def neutralize_one_factor(src_factor: str,
                           run_mode: str, bgn_date: str, stp_date: str,
                           mother_universe_df: pd.DataFrame, sector_df: pd.DataFrame,
                           available_universe_dir: str,
-                          factors_exposure_dir: str,
-                          factors_exposure_neutral_dir: str,
+                          factors_exposure_raw_dir: str,
+                          factors_exposure_neu_dir: str,
                           calendar: CCalendar, ):
     # --- factor neutral library
-    factor_neutral_lib_struct = get_lib_struct_factor_exposure(f"{src_factor}_{neutral_method}")
-    factor_neutral_lib = CManagerLibWriter(t_db_name=factor_neutral_lib_struct.m_lib_name, t_db_save_dir=factors_exposure_neutral_dir)
+    factor_neutral_lib_struct = get_lib_struct_factor_exposure(f"{src_factor}_NEU")
+    factor_neutral_lib = CManagerLibWriter(t_db_name=factor_neutral_lib_struct.m_lib_name, t_db_save_dir=factors_exposure_neu_dir)
     factor_neutral_lib.initialize_table(t_table=factor_neutral_lib_struct.m_tab, t_remove_existence=run_mode in ["O"])
     is_continuous = factor_neutral_lib.check_continuity(append_date=bgn_date, t_calendar=calendar) if run_mode in ["A"] else 0
     if is_continuous == 0:
@@ -44,7 +44,7 @@ def neutralize_one_factor(src_factor: str, neutral_method: str,
 
         # --- src factor library
         src_factor_lib_struct = get_lib_struct_factor_exposure(src_factor)
-        src_factor_lib = CManagerLibReader(t_db_name=src_factor_lib_struct.m_lib_name, t_db_save_dir=factors_exposure_dir)
+        src_factor_lib = CManagerLibReader(t_db_name=src_factor_lib_struct.m_lib_name, t_db_save_dir=factors_exposure_raw_dir)
         src_factor_lib.set_default(src_factor_lib_struct.m_tab.m_table_name)
 
         factor_df = src_factor_lib.read_by_conditions(t_conditions=[
@@ -63,7 +63,7 @@ def neutralize_one_factor(src_factor: str, neutral_method: str,
         input_df.dropna(axis=0, subset=["value"], inplace=True)
         res_agg = input_df.groupby(by="trade_date", group_keys=True).apply(
             neutralize_one_factor_one_day, mother_df=mother_universe_df,
-            neutral_method=neutral_method, weight_id=__weight_id, sector_df=sector_df,
+            weight_id=__weight_id, sector_df=sector_df,
         )
 
         # type of res_agg may vary according to the result:

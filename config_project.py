@@ -15,12 +15,12 @@ bgn_dates_in_overwrite_mod = {
     "FE": "20130101",  # factor_exposure
     "FEN": "20130101",  # factor_exposure_neutral
 
-    "IC": "20150701",  # ic-test
-    "ICN": "20150701",  # ic-test-neutral
-    "FECOR": "20150701",  # factors correlation
+    "IC": "20140701",  # ic-test
+    "ICN": "20140701",  # ic-test-neutral
+    "FECOR": "20140701",  # factors correlation
 
-    "SIG": "20150701",  # signals
-    "SIMU": "20150701",  # signals
+    "SIG": "20140701",  # signals
+    "SIMU": "20140701",  # signals
 }
 
 # universe

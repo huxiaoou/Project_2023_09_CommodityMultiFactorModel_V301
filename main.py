@@ -267,7 +267,6 @@ if __name__ == "__main__":
             agent_transformer = CMpTransformer(proc_num, src_factor_ids, "LD", factors_settings[factor]["LD"], direction, factors_exposure_raw_dir,
                                                run_mode, bgn_date, stp_date, factor)
             agent_transformer.mp_cal_transform(**shared_keywords)
-
         elif factor == "BETA":
             from setup_project import instruments_return_dir
 
@@ -316,18 +315,19 @@ if __name__ == "__main__":
             ewm_bgn_date = bgn_dates_in_overwrite_mod["FEB"]
             agent_factor = CMpFactorRSI(proc_num, factors_settings[factor]["N"], ewm_bgn_date, run_mode, bgn_date, stp_date)
             agent_factor.mp_cal_factor(futures_by_instrument_dir=futures_by_instrument_dir, major_return_db_name=major_return_db_name, **shared_keywords)
-    # elif switch in ["FEN"]:
-    #     from factors.factors_neutral import cal_factors_neutral_mp
-    #
-    #     cal_factors_neutral_mp(
-    #         proc_num=proc_num, factors=factors,
-    #         neutral_method=neutral_method,
-    #         run_mode=run_mode, bgn_date=bgn_date, stp_date=stp_date,
-    #         mother_universe_df=mother_universe_df, sector_df=sector_df,
-    #         available_universe_dir=available_universe_dir,
-    #         factors_exposure_dir=factors_exposure_dir,
-    #         factors_exposure_neutral_dir=factors_exposure_neutral_dir,
-    #         calendar=calendar, )
+    elif switch in ["FEN"]:
+        from config_factor import factors_raw
+        from setup_project import available_universe_dir, factors_exposure_raw_dir, factors_exposure_neu_dir
+        from factors.factors_neutral import cal_factors_neutral_mp
+
+        cal_factors_neutral_mp(
+            proc_num=proc_num, factors=factors_raw,
+            run_mode=run_mode, bgn_date=bgn_date, stp_date=stp_date,
+            mother_universe_df=mother_universe_df, sector_df=sector_df,
+            available_universe_dir=available_universe_dir,
+            factors_exposure_raw_dir=factors_exposure_raw_dir,
+            factors_exposure_neu_dir=factors_exposure_neu_dir,
+            calendar=calendar, )
     # elif switch in ["IC"]:
     #     from ic_tests.ic_tests_cls import cal_ic_tests_mp
     #

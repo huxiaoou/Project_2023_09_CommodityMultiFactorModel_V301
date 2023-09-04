@@ -252,7 +252,7 @@ class CFactorsCBETA(CFactorsWithMajorReturnAndExchangeRate):
         db_reader.close()
         df.set_index("trade_date", inplace=True)
 
-        df["exchange"] = self.manager_exchange_rate.df["pct_chg"] / 100
+        df["exchange"] = self.manager_exchange_rate.df["pct_chg"].fillna(0) / 100
         s = cal_rolling_beta(df, x="exchange", y="major_return", rolling_window=self.arg_win)
         return self.truncate_series(s, bgn_date)
 
@@ -285,7 +285,7 @@ class CFactorsIBETA(CFactorsWithMajorReturnAndMacroEconomic):
         filter_month = (month_ret_df.index >= base_month) & (month_ret_df.index < end_last_month)
         selected_month_ret_df: pd.DataFrame = month_ret_df.loc[filter_month].copy()
         selected_month_ret_df["cpi"] = self.manager_macro_economic.df["cpi_rate"] / 100
-        selected_month_ret_df["cpi_diff"] = selected_month_ret_df["cpi"] - selected_month_ret_df["cpi"].shift(1)
+        selected_month_ret_df["cpi_diff"] = (self.manager_macro_economic.df["cpi_rate"] - self.manager_macro_economic.df["cpi_rate"].shift(1)) / 100
         ms = cal_rolling_beta(selected_month_ret_df, x="cpi_diff", y="major_return", rolling_window=arg_win_month)
         ms = pd.concat([ms, pd.Series({end_last_month: np.nan, iter_dates[-1][0:6]: np.nan})])
         ms_shift = ms.shift(2)
