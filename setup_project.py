@@ -79,7 +79,9 @@ factors_exposure_raw_dir = os.path.join(factors_exposure_dir, "raw")
 factors_exposure_neu_dir = os.path.join(factors_exposure_dir, "neu")
 factors_exposure_cor_dir = os.path.join(factors_exposure_dir, "cor")
 ic_tests_dir = os.path.join(factors_library_dir, "ic_tests")
-ic_tests_summary_dir = os.path.join(factors_library_dir, "ic_tests_summary")
+ic_tests_raw_dir = os.path.join(ic_tests_dir, "raw")
+ic_tests_neu_dir = os.path.join(ic_tests_dir, "neu")
+ic_tests_summary_dir = os.path.join(ic_tests_dir, "summary")
 
 # portfolio
 signals_dir = os.path.join(portfolio_dir, "signals")
@@ -110,6 +112,8 @@ if __name__ == "__main__":
     check_and_mkdir(factors_exposure_raw_dir)
     check_and_mkdir(factors_exposure_cor_dir)
     check_and_mkdir(ic_tests_dir)
+    check_and_mkdir(ic_tests_raw_dir)
+    check_and_mkdir(ic_tests_neu_dir)
     check_and_mkdir(ic_tests_summary_dir)
 
     check_and_mkdir(portfolio_dir)

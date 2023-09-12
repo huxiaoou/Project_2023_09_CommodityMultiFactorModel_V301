@@ -330,12 +330,12 @@ if __name__ == "__main__":
             calendar=calendar, )
     elif switch in ["IC"]:
         from config_factor import factors_raw
-        from setup_project import ic_tests_dir, available_universe_dir, factors_exposure_raw_dir, test_return_dir
+        from setup_project import ic_tests_raw_dir, available_universe_dir, factors_exposure_raw_dir, test_return_dir
         from ic_tests.ic_tests_cls import cal_ic_tests_mp
 
         cal_ic_tests_mp(
             proc_num=proc_num, factors=factors_raw,
-            ic_tests_dir=ic_tests_dir,
+            ic_tests_dir=ic_tests_raw_dir,
             available_universe_dir=available_universe_dir,
             exposure_dir=factors_exposure_raw_dir,
             test_return_dir=test_return_dir,
@@ -345,12 +345,12 @@ if __name__ == "__main__":
         )
     elif switch in ["ICN"]:
         from config_factor import factors_raw
-        from setup_project import ic_tests_dir, available_universe_dir, factors_exposure_neu_dir, test_return_dir
+        from setup_project import ic_tests_neu_dir, available_universe_dir, factors_exposure_neu_dir, test_return_dir
         from ic_tests.ic_tests_cls import cal_ic_tests_mp
 
         cal_ic_tests_mp(
             proc_num=proc_num, factors=factors_raw,
-            ic_tests_dir=ic_tests_dir,
+            ic_tests_dir=ic_tests_neu_dir,
             available_universe_dir=available_universe_dir,
             exposure_dir=factors_exposure_neu_dir,
             test_return_dir=test_return_dir,
@@ -361,11 +361,11 @@ if __name__ == "__main__":
     elif switch in ["ICS"]:
         from config_factor import factors_raw, factors_classification, factors_group
         from config_portfolio import selected_raw_factors
-        from setup_project import ic_tests_dir, ic_tests_summary_dir
+        from setup_project import ic_tests_raw_dir, ic_tests_summary_dir
         from ic_tests.ic_tests_cls_summary import CICTestsSummary
 
         agent_summary = CICTestsSummary(
-            proc_num=proc_num, ic_tests_dir=ic_tests_dir,
+            proc_num=proc_num, ic_tests_dir=ic_tests_raw_dir,
             ic_tests_summary_dir=ic_tests_summary_dir, neutral_tag="RAW",
         )
         agent_summary.get_summary_mp(factors_raw, factors_classification)
@@ -374,11 +374,11 @@ if __name__ == "__main__":
     elif switch in ["ICNS"]:
         from config_factor import factors_raw, factors_classification, factors_group
         from config_portfolio import selected_neu_factors
-        from setup_project import ic_tests_dir, ic_tests_summary_dir
+        from setup_project import ic_tests_neu_dir, ic_tests_summary_dir
         from ic_tests.ic_tests_cls_summary import CICTestsSummary
 
         agent_summary = CICTestsSummary(
-            proc_num=proc_num, ic_tests_dir=ic_tests_dir,
+            proc_num=proc_num, ic_tests_dir=ic_tests_neu_dir,
             ic_tests_summary_dir=ic_tests_summary_dir, neutral_tag="NEU",
         )
         agent_summary.get_summary_mp(factors_raw, factors_classification)

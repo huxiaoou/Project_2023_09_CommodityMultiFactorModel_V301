@@ -146,12 +146,12 @@ def cal_ic_tests_comparison(ic_tests_summary_dir: str):
     pd.set_option("display.width", 0)
     pd.set_option("display.max_rows", 1000)
 
-    statistics_file = "ic_statistics-raw.csv"
+    statistics_file = "ic_statistics-RAW.csv"
     statistics_path = os.path.join(ic_tests_summary_dir, statistics_file)
     statistics_df = pd.read_csv(statistics_path)
     statistics_df = statistics_df[["class", "factor", "ICMean", "ICStd", "ICIR"]]
 
-    statistics_neutral_file = f"ic_statistics_neu.csv"
+    statistics_neutral_file = f"ic_statistics-NEU.csv"
     statistics_neutral_path = os.path.join(ic_tests_summary_dir, statistics_neutral_file)
     statistics_neutral_df = pd.read_csv(statistics_neutral_path)
     statistics_neutral_df = statistics_neutral_df[["class", "factor", "ICMean", "ICStd", "ICIR"]]
