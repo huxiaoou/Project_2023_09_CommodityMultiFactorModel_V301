@@ -7,10 +7,10 @@ from skyrim.whiterun import CCalendar
 from skyrim.falkreath import CManagerLibReader
 
 
-def cal_factors_exposure_corr(neutral_method: str,
+def cal_factors_exposure_corr(neutral_tag: str,
                               test_factor_list_l: list, test_factor_list_r: list,
                               bgn_date: str, stp_date: str,
-                              factors_exposure_dir: str, factors_exposure_neutral_dir,
+                              factors_exposure_src_dir: str,
                               factors_exposure_corr_dir: str,
                               calendar: CCalendar, ):
     # --- get test factor list
@@ -21,23 +21,22 @@ def cal_factors_exposure_corr(neutral_method: str,
         factor_comb_list = list(ittl.combinations(test_factor_list_l, 2))
 
     # --- set save id
-    if neutral_method == "":
-        save_id = "-".join(test_factor_list)
-        src_dir = factors_exposure_dir
+    if neutral_tag in ["RAW", "NEU"]:
+        save_id = "-".join(test_factor_list) + "_" + neutral_tag
     else:
-        save_id = "-".join(test_factor_list) + "." + neutral_method
-        src_dir = factors_exposure_neutral_dir
+        print("... Not a right input for parameter 'neutral tag', please check again.")
+        return -1
 
     # --- initialize factor libs
     factor_libs_manager: dict[str, CManagerLibReader] = {}
     for factor_lbl in test_factor_list:
-        if neutral_method == "":
+        if neutral_tag == "RAW":
             lib_struct = get_lib_struct_factor_exposure(factor_lbl)
         else:
-            lib_struct = get_lib_struct_factor_exposure(f"{factor_lbl}_{neutral_method}")
+            lib_struct = get_lib_struct_factor_exposure(f"{factor_lbl}_NEU")
         factor_libs_manager[factor_lbl] = CManagerLibReader(
             t_db_name=lib_struct.m_lib_name,
-            t_db_save_dir=src_dir
+            t_db_save_dir=factors_exposure_src_dir
         )
         factor_libs_manager[factor_lbl].set_default(lib_struct.m_tab.m_table_name)
 
@@ -65,18 +64,18 @@ def cal_factors_exposure_corr(neutral_method: str,
     # --- plot
     plot_lines(
         factor_corr_by_date_df_cumsum,
-        t_fig_name="factors.corr.{}.cumsum".format(save_id), t_save_dir=factors_exposure_corr_dir,
+        t_fig_name=f"factors_corr_{save_id}_cumsum", t_save_dir=factors_exposure_corr_dir,
         t_colormap="jet"
     )
 
     # --- save
     factor_corr_by_date_df.to_csv(
-        os.path.join(factors_exposure_corr_dir, "factors.corr.{}.csv.gz".format(save_id)),
+        os.path.join(factors_exposure_corr_dir, f"factors_corr_{save_id}.csv.gz"),
         index_label="trade_date",
         float_format="%.4f"
     )
     factor_corr_by_date_df_cumsum.to_csv(
-        os.path.join(factors_exposure_corr_dir, "factors.corr.{}.cumsum.csv.gz".format(save_id)),
+        os.path.join(factors_exposure_corr_dir, f"factors_corr_{save_id}_cumsum.csv.gz"),
         index_label="trade_date",
         float_format="%.4f"
     )

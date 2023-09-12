@@ -389,31 +389,21 @@ if __name__ == "__main__":
         from ic_tests.ic_tests_cls_summary import cal_ic_tests_comparison
 
         cal_ic_tests_comparison(ic_tests_summary_dir)
-    # elif switch in ["FECOR"]:
-    #     from factors.factors_exposure_corr import cal_factors_exposure_corr
-    #
-    #     # test_factor_list_l = ["SKEW010", "SKEW126"]
-    #     # test_factor_list_l = ["BASISA063", "BASISBD010"]
-    #     # test_factor_list_l = ["CSP189", "CSP126LD021"]
-    #     # test_factor_list_l = ["CTP126", "CTP189LD063"]
-    #     # test_factor_list_l = ["CTP126", "CSP189"]
-    #     # test_factor_list_l = ["CVP126", "CVP189LD021"]
-    #     # test_factor_list_l = ["RSLR252", "RSBR252"]
-    #     # test_factor_list_l = ["SKEW010", "SKEW010LD063"]
-    #     # test_factor_list_l = ["CSP189", "CSP126LD021", "CTP126", "CTP189LD063", "CVP126", "CVP189LD063" ]
-    #     test_factor_list_l = ["CSP189", "CSP126LD021", "CTP126", "CTP189LD063"]
-    #     test_factor_list_r = []
-    #
-    #     test_neutral_method = "WS"
-    #
-    #     cal_factors_exposure_corr(
-    #         neutral_method=test_neutral_method,
-    #         test_factor_list_l=test_factor_list_l, test_factor_list_r=test_factor_list_r,
-    #         bgn_date=bgn_date, stp_date=stp_date,
-    #         factors_exposure_dir=factors_exposure_dir,
-    #         factors_exposure_neutral_dir=factors_exposure_neutral_dir,
-    #         factors_exposure_corr_dir=factors_exposure_corr_dir,
-    #         calendar=calendar, )
+    elif switch in ["FECOR"]:
+        from setup_project import factors_exposure_raw_dir, factors_exposure_neu_dir, factors_exposure_cor_dir
+        from factors.factors_exposure_corr import cal_factors_exposure_corr
+
+        test_factor_list_l = ["CTP120", "CSP120", "CVP120", "CSP180LD020"]
+        test_factor_list_r = []
+        test_neutral_tag = ["RAW", "NEU"][0]
+
+        cal_factors_exposure_corr(
+            neutral_tag=test_neutral_tag,
+            test_factor_list_l=test_factor_list_l, test_factor_list_r=test_factor_list_r,
+            bgn_date=bgn_date, stp_date=stp_date,
+            factors_exposure_src_dir=factors_exposure_raw_dir if test_neutral_tag == "RAW" else factors_exposure_neu_dir,
+            factors_exposure_corr_dir=factors_exposure_cor_dir,
+            calendar=calendar, )
     # elif switch in ["SIG"]:
     #     from signals.signals_cls import cal_signals_hedge_mp, cal_signals_hedge_ma_mp
     #     from signals.signals_cls_portfolio import CSignalCombineFromOtherSignalsWithFixWeight, CSignalCombineFromOtherSignalsWithDynWeight
