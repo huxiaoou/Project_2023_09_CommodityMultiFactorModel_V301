@@ -82,23 +82,6 @@ class CEvaluationPortfolio(CEvaluation):
         return 0
 
 
-def eval_hedge_mp(proc_num: int, factors: list[str], factors_neutral: list[str], uni_props: tuple[float], **kwargs):
-    t0 = dt.datetime.now()
-    pool = mp.Pool(processes=proc_num)
-    for (fs, fid), uni_prop in ittl.product([(factors, "raw"), (factors_neutral, "neu")], uni_props):
-        uni_prop_lbl = f"UHP{int(uni_prop * 10):02d}"
-        eval_id = f"factors_{fid}_{uni_prop_lbl}"
-        simu_ids = [f"{_}_{uni_prop_lbl}" for _ in fs]
-        agent_eval = CEvaluationWithFactorClass(eval_id=eval_id, simu_ids=simu_ids, **kwargs)
-        pool.apply_async(agent_eval.main)
-    pool.close()
-    pool.join()
-    t1 = dt.datetime.now()
-    print(f"... {SetFontGreen('Summary for Hedge Test')} calculated")
-    print(f"... total time consuming:{SetFontGreen(f'{(t1 - t0).total_seconds():.2f}')} seconds")
-    return 0
-
-
 def eval_hedge_ma_mp(proc_num: int, factors: list[str], factors_neutral: list[str], uni_props: tuple[float], mov_ave_wins: tuple[int], **kwargs):
     t0 = dt.datetime.now()
     pool = mp.Pool(processes=proc_num)
@@ -189,21 +172,21 @@ def plot_selected_factors_and_uni_prop(
 
 
 def plot_selected_factors_and_uni_prop_ma(
-        selected_factors_and_uni_prop_ma: tuple[tuple], save_id: str,
+        selected_factors_and_uni_prop_ma: tuple[tuple], neutral_tag: str,
         simu_save_dir: str, eval_save_dir: str):
     nav_data = {}
     for factor, uni_prop, mov_ave_win in selected_factors_and_uni_prop_ma:
         uni_prop_lbl = f"UHP{int(uni_prop * 10):02d}"
         ma_lbl = f"MA{mov_ave_win:02d}"
-        if save_id == "raw":
+        if neutral_tag == "RAW":
             simu_id = f"{factor}_{uni_prop_lbl}_{ma_lbl}"
         else:
-            simu_id = f"{factor}_WS_{uni_prop_lbl}_{ma_lbl}"
+            simu_id = f"{factor}_NEU_{uni_prop_lbl}_{ma_lbl}"
         simu_nav_file = f"nav-{simu_id}.csv.gz"
         simu_nav_path = os.path.join(simu_save_dir, simu_nav_file)
         simu_nav_df = pd.read_csv(simu_nav_path, dtype={"trade_date": str}).set_index("trade_date")
         nav_data[simu_id] = simu_nav_df["nav"]
     nav_df = pd.DataFrame(nav_data)
-    plot_lines(t_plot_df=nav_df, t_fig_name=f"selected-factors_and_uni_prop_ma-{save_id}-nav", t_save_dir=eval_save_dir)
-    print(f"... @ {dt.datetime.now()} selected factors and uni-prop for {SetFontGreen(save_id)} plotted")
+    plot_lines(t_plot_df=nav_df, t_fig_name=f"selected-factors_and_uni_prop_ma-{neutral_tag}-nav", t_save_dir=eval_save_dir)
+    print(f"... @ {dt.datetime.now()} selected factors and uni-prop for {SetFontGreen(neutral_tag)} plotted")
     return 0

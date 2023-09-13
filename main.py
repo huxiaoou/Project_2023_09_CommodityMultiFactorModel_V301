@@ -404,187 +404,184 @@ if __name__ == "__main__":
             factors_exposure_src_dir=factors_exposure_raw_dir if test_neutral_tag == "RAW" else factors_exposure_neu_dir,
             factors_exposure_corr_dir=factors_exposure_cor_dir,
             calendar=calendar, )
-    # elif switch in ["SIG"]:
-    #     from signals.signals_cls import cal_signals_hedge_mp, cal_signals_hedge_ma_mp
-    #     from signals.signals_cls_portfolio import CSignalCombineFromOtherSignalsWithFixWeight, CSignalCombineFromOtherSignalsWithDynWeight
-    #     from signals.signals_cls_optimizer import CSignalOptimizerMinUtyCon
-    #     from config_portfolio import (size_raw, size_raw_ma, src_signal_ids_raw, src_signal_ids_raw_ma,
-    #                                   size_neu, size_neu_ma, src_signal_ids_neu, src_signal_ids_neu_ma,
-    #                                   trn_win, lbd, min_model_days)
-    #
-    #     if sig_type == "HEDGE":
-    #         cal_signals_hedge_mp(proc_num=proc_num, factors=factors, uni_props=uni_props,
-    #                              available_universe_dir=available_universe_dir, signals_save_dir=signals_hedge_test_dir,
-    #                              src_factor_dir=factors_exposure_dir, calendar=calendar, tips="signals-raw",
-    #                              run_mode=run_mode, bgn_date=bgn_date, stp_date=stp_date)
-    #         cal_signals_hedge_mp(proc_num=proc_num, factors=factors_neutral, uni_props=uni_props,
-    #                              available_universe_dir=available_universe_dir, signals_save_dir=signals_hedge_test_dir,
-    #                              src_factor_dir=factors_exposure_neutral_dir, calendar=calendar, tips=f"signals-{neutral_method}",
-    #                              run_mode=run_mode, bgn_date=bgn_date, stp_date=stp_date)
-    #     elif sig_type == "HEDGE-MA":
-    #         cal_signals_hedge_ma_mp(proc_num=proc_num, factors=factors + factors_neutral, uni_props=uni_props, mov_ave_wins=mov_ave_wins,
-    #                                 src_signals_save_dir=signals_hedge_test_dir, signals_save_dir=signals_hedge_test_ma_dir, calendar=calendar,
-    #                                 tips="signals-hedge-ma", run_mode=run_mode, bgn_date=bgn_date, stp_date=stp_date)
-    #     elif sig_type == "PORTFOLIO":
-    #         from skyrim.whiterun import SetFontGreen
-    #
-    #         print(SetFontGreen(f"... trnWin = {trn_win:>2d} | lbd = {lbd:>6.2f}"))
-    #
-    #         # RAW FIX
-    #         signals = CSignalCombineFromOtherSignalsWithFixWeight(src_signal_weight={_: 1 / size_raw for _ in src_signal_ids_raw},
-    #                                                               src_signal_ids=src_signal_ids_raw, src_signal_dir=signals_hedge_test_dir, sig_id="raw_fix",
-    #                                                               sig_save_dir=signals_portfolios_dir, calendar=calendar)
-    #         signals.main(run_mode, bgn_date, stp_date)
-    #
-    #         # RAW FIX MA
-    #         signals = CSignalCombineFromOtherSignalsWithFixWeight(src_signal_weight={_: 1 / size_raw_ma for _ in src_signal_ids_raw_ma},
-    #                                                               src_signal_ids=src_signal_ids_raw_ma, src_signal_dir=signals_hedge_test_ma_dir, sig_id="raw_fix_ma",
-    #                                                               sig_save_dir=signals_portfolios_dir, calendar=calendar)
-    #         signals.main(run_mode, bgn_date, stp_date)
-    #
-    #         # NEW FIX
-    #         signals = CSignalCombineFromOtherSignalsWithFixWeight(src_signal_weight={_: 1 / size_neu for _ in src_signal_ids_neu},
-    #                                                               src_signal_ids=src_signal_ids_neu, src_signal_dir=signals_hedge_test_dir, sig_id="neu_fix",
-    #                                                               sig_save_dir=signals_portfolios_dir, calendar=calendar)
-    #         signals.main(run_mode, bgn_date, stp_date)
-    #
-    #         # NEW FIX MA
-    #         signals = CSignalCombineFromOtherSignalsWithFixWeight(src_signal_weight={_: 1 / size_neu_ma for _ in src_signal_ids_neu_ma},
-    #                                                               src_signal_ids=src_signal_ids_neu_ma, src_signal_dir=signals_hedge_test_ma_dir, sig_id="neu_fix_ma",
-    #                                                               sig_save_dir=signals_portfolios_dir, calendar=calendar)
-    #         signals.main(run_mode, bgn_date, stp_date)
-    #
-    #         # RAW DYN
-    #         optimizer = CSignalOptimizerMinUtyCon(save_id="raw_min_uty_con", src_signal_ids=src_signal_ids_raw,
-    #                                               weight_bounds=(1 / size_raw / 2, 2 / size_raw), total_pos_lim=(0, 1), maxiter=10000,
-    #                                               trn_win=trn_win, min_model_days=min_model_days, lbd=lbd,
-    #                                               simu_test_dir=simulations_hedge_test_dir, optimized_dir=signals_optimized_dir,
-    #                                               calendar=calendar)
-    #         optimizer.main(run_mode, bgn_date, stp_date)
-    #         signal_weight_df = optimizer.get_signal_weight(bgn_date, stp_date)
-    #         signals = CSignalCombineFromOtherSignalsWithDynWeight(src_signal_weight=signal_weight_df,
-    #                                                               src_signal_ids=src_signal_ids_raw, src_signal_dir=signals_hedge_test_dir, sig_id="raw_min_uty_con",
-    #                                                               sig_save_dir=signals_portfolios_dir, calendar=calendar)
-    #         signals.main(run_mode, bgn_date, stp_date)
-    #
-    #         # RAW DYN MA
-    #         optimizer = CSignalOptimizerMinUtyCon(save_id="raw_min_uty_con_ma", src_signal_ids=src_signal_ids_raw_ma,
-    #                                               weight_bounds=(1 / size_raw_ma / 2, 2 / size_raw_ma), total_pos_lim=(0, 1), maxiter=10000,
-    #                                               trn_win=trn_win, min_model_days=min_model_days, lbd=lbd,
-    #                                               simu_test_dir=simulations_hedge_test_ma_dir, optimized_dir=signals_optimized_dir,
-    #                                               calendar=calendar)
-    #         optimizer.main(run_mode, bgn_date, stp_date)
-    #         signal_weight_df = optimizer.get_signal_weight(bgn_date, stp_date)
-    #         signals = CSignalCombineFromOtherSignalsWithDynWeight(src_signal_weight=signal_weight_df,
-    #                                                               src_signal_ids=src_signal_ids_raw_ma, src_signal_dir=signals_hedge_test_ma_dir, sig_id="raw_min_uty_con_ma",
-    #                                                               sig_save_dir=signals_portfolios_dir, calendar=calendar)
-    #         signals.main(run_mode, bgn_date, stp_date)
-    #
-    #         # NEU DYN
-    #         optimizer = CSignalOptimizerMinUtyCon(save_id="neu_min_uty_con", src_signal_ids=src_signal_ids_neu,
-    #                                               weight_bounds=(1 / size_neu / 2, 2 / size_neu), total_pos_lim=(0, 1), maxiter=10000,
-    #                                               trn_win=trn_win, min_model_days=min_model_days, lbd=lbd,
-    #                                               simu_test_dir=simulations_hedge_test_dir, optimized_dir=signals_optimized_dir,
-    #                                               calendar=calendar)
-    #         optimizer.main(run_mode, bgn_date, stp_date)
-    #         signal_weight_df = optimizer.get_signal_weight(bgn_date, stp_date)
-    #         signals = CSignalCombineFromOtherSignalsWithDynWeight(src_signal_weight=signal_weight_df,
-    #                                                               src_signal_ids=src_signal_ids_neu, src_signal_dir=signals_hedge_test_dir, sig_id="neu_min_uty_con",
-    #                                                               sig_save_dir=signals_portfolios_dir, calendar=calendar)
-    #         signals.main(run_mode, bgn_date, stp_date)
-    #
-    #         # NEU DYN MA
-    #         optimizer = CSignalOptimizerMinUtyCon(save_id="neu_min_uty_con_ma", src_signal_ids=src_signal_ids_neu_ma,
-    #                                               weight_bounds=(1 / size_neu_ma / 2, 2 / size_neu_ma), total_pos_lim=(0, 1), maxiter=10000,
-    #                                               trn_win=trn_win, min_model_days=min_model_days, lbd=lbd,
-    #                                               simu_test_dir=simulations_hedge_test_ma_dir, optimized_dir=signals_optimized_dir,
-    #                                               calendar=calendar)
-    #         optimizer.main(run_mode, bgn_date, stp_date)
-    #         signal_weight_df = optimizer.get_signal_weight(bgn_date, stp_date)
-    #         signals = CSignalCombineFromOtherSignalsWithDynWeight(src_signal_weight=signal_weight_df,
-    #                                                               src_signal_ids=src_signal_ids_neu_ma, src_signal_dir=signals_hedge_test_ma_dir, sig_id="neu_min_uty_con_ma",
-    #                                                               sig_save_dir=signals_portfolios_dir, calendar=calendar)
-    #         signals.main(run_mode, bgn_date, stp_date)
-    #
-    # elif switch in ["SIMU"]:
-    #     from simulations.simulation_cls import cal_simulations_mp
-    #     from config_portfolio import test_portfolio_ids
-    #
-    #     if sig_type == "HEDGE":
-    #         sig_ids = [f"{sid}_UHP{int(uni_prop * 10):02d}"
-    #                    for sid, uni_prop in ittl.product(factors + factors_neutral, uni_props)]
-    #         cal_simulations_mp(
-    #             proc_num=proc_num,
-    #             sig_ids=sig_ids, test_bgn_date=bgn_date, test_stp_date=stp_date,
-    #             cost_rate=cost_rate_hedge_test, test_universe=concerned_instruments_universe,
-    #             signals_dir=signals_hedge_test_dir, simulations_dir=simulations_hedge_test_dir,
-    #             futures_by_instrument_dir=futures_by_instrument_dir, major_return_db_name=major_return_db_name,
-    #             calendar=calendar, tips="Hedge test for factors"
-    #         )
-    #
-    #     elif sig_type == "HEDGE-MA":
-    #         sig_ids = [f"{sid}_UHP{int(uni_prop * 10):02d}_MA{mov_ave_win:02d}"
-    #                    for sid, uni_prop, mov_ave_win in ittl.product(factors + factors_neutral, uni_props, mov_ave_wins)]
-    #         cal_simulations_mp(
-    #             proc_num=proc_num,
-    #             sig_ids=sig_ids, test_bgn_date=bgn_date, test_stp_date=stp_date,
-    #             cost_rate=cost_rate_hedge_test, test_universe=concerned_instruments_universe,
-    #             signals_dir=signals_hedge_test_ma_dir, simulations_dir=simulations_hedge_test_ma_dir,
-    #             futures_by_instrument_dir=futures_by_instrument_dir, major_return_db_name=major_return_db_name,
-    #             calendar=calendar, tips="Hedge test for factors"
-    #         )
-    #
-    #     elif sig_type == "PORTFOLIO":
-    #         cal_simulations_mp(
-    #             proc_num=proc_num,
-    #             sig_ids=test_portfolio_ids, test_bgn_date=bgn_date, test_stp_date=stp_date,
-    #             cost_rate=cost_rate_portfolios, test_universe=concerned_instruments_universe,
-    #             signals_dir=signals_portfolios_dir, simulations_dir=simulations_portfolios_dir,
-    #             futures_by_instrument_dir=futures_by_instrument_dir, major_return_db_name=major_return_db_name,
-    #             calendar=calendar, tips="Simulation for portfolios"
-    #         )
-    #
-    # elif switch in ["EVAL"]:
-    #     from config_portfolio import risk_free_rate, performance_indicators, test_portfolio_ids
-    #
-    #     if sig_type == "HEDGE":
-    #         from simulations.evaluations_cls import eval_hedge_mp, concat_eval_results, plot_selected_factors_and_uni_prop
-    #
-    #         eval_hedge_mp(proc_num=proc_num,
-    #                       factors=factors, factors_neutral=factors_neutral, uni_props=uni_props,
-    #                       factors_classification=factors_classification,
-    #                       indicators=performance_indicators,
-    #                       simu_save_dir=simulations_hedge_test_dir,
-    #                       eval_save_dir=evaluations_hedge_test_dir,
-    #                       annual_risk_free_rate=risk_free_rate
-    #                       )
-    #         concat_eval_results(uni_props, evaluations_hedge_test_dir)
-    #         plot_selected_factors_and_uni_prop(selected_raw_factors_and_uni_prop, "raw", simulations_hedge_test_dir, evaluations_hedge_test_dir)
-    #         plot_selected_factors_and_uni_prop(selected_neu_factors_and_uni_prop, "neu", simulations_hedge_test_dir, evaluations_hedge_test_dir)
-    #     elif sig_type == "HEDGE-MA":
-    #         from simulations.evaluations_cls import eval_hedge_ma_mp, concat_eval_ma_results, plot_selected_factors_and_uni_prop_ma
-    #
-    #         eval_hedge_ma_mp(proc_num=proc_num,
-    #                          factors=factors, factors_neutral=factors_neutral, uni_props=uni_props, mov_ave_wins=mov_ave_wins,
-    #                          factors_classification=factors_classification,
-    #                          indicators=performance_indicators,
-    #                          simu_save_dir=simulations_hedge_test_ma_dir,
-    #                          eval_save_dir=evaluations_hedge_test_ma_dir,
-    #                          annual_risk_free_rate=risk_free_rate
-    #                          )
-    #         concat_eval_ma_results(uni_props, mov_ave_wins, evaluations_hedge_test_ma_dir)
-    #         plot_selected_factors_and_uni_prop_ma(selected_raw_factors_and_uni_prop_ma, "raw", simulations_hedge_test_ma_dir, evaluations_hedge_test_ma_dir)
-    #         plot_selected_factors_and_uni_prop_ma(selected_neu_factors_and_uni_prop_ma, "neu", simulations_hedge_test_ma_dir, evaluations_hedge_test_ma_dir)
-    #
-    #     elif sig_type == "PORTFOLIO":
-    #         from simulations.evaluations_cls import CEvaluationPortfolio
-    #
-    #         evaluator = CEvaluationPortfolio(
-    #             eval_id="test", simu_ids=test_portfolio_ids,
-    #             indicators=performance_indicators, simu_save_dir=simulations_portfolios_dir,
-    #             eval_save_dir=evaluations_portfolios_dir, annual_risk_free_rate=0,
-    #         )
-    #         evaluator.main(True)
+    elif switch in ["SIG"]:
+        if sig_type == "HEDGE-RAW":
+            from config_factor import factors_raw, factors_neu
+            from config_portfolio import uni_props
+            from setup_project import available_universe_dir, signals_factor_raw_dir, factors_exposure_raw_dir, factors_exposure_neu_dir
+            from signals.signals_cls import cal_signals_hedge_mp
+
+            cal_signals_hedge_mp(proc_num=proc_num, factors=factors_raw, uni_props=uni_props,
+                                 available_universe_dir=available_universe_dir, signals_save_dir=signals_factor_raw_dir,
+                                 src_factor_dir=factors_exposure_raw_dir, calendar=calendar, tips="signals-raw-hedge",
+                                 run_mode=run_mode, bgn_date=bgn_date, stp_date=stp_date)
+            cal_signals_hedge_mp(proc_num=proc_num, factors=factors_neu, uni_props=uni_props,
+                                 available_universe_dir=available_universe_dir, signals_save_dir=signals_factor_raw_dir,
+                                 src_factor_dir=factors_exposure_neu_dir, calendar=calendar, tips=f"signals-neu-hedge",
+                                 run_mode=run_mode, bgn_date=bgn_date, stp_date=stp_date)
+        elif sig_type == "HEDGE-MA":
+            from config_factor import factors_raw, factors_neu
+            from config_portfolio import uni_props, mov_ave_wins
+            from setup_project import signals_hedge_test_dir, signals_factor_raw_dir
+            from signals.signals_cls import cal_signals_hedge_ma_mp
+
+            cal_signals_hedge_ma_mp(proc_num=proc_num, factors=factors_raw + factors_neu, uni_props=uni_props, mov_ave_wins=mov_ave_wins,
+                                    src_signals_save_dir=signals_factor_raw_dir, signals_save_dir=signals_hedge_test_dir, calendar=calendar,
+                                    tips="signals-hedge-ma", run_mode=run_mode, bgn_date=bgn_date, stp_date=stp_date)
+        elif sig_type == "PORTFOLIO":
+            from setup_project import signals_hedge_test_dir, signals_portfolios_dir, simulations_hedge_test_dir, signals_optimized_dir
+            from config_factor import factors_classification, factors_raw, factors_neu
+            from config_portfolio import (src_signal_ids_raw, src_signal_ids_neu,
+                                          selected_src_signal_ids_raw, selected_src_signal_ids_neu, size_raw, size_neu,
+                                          dyn_top_n, trn_win, lbd, min_model_days)
+            from signals.signals_cls_portfolio import CSignalCombineFromOtherSignalsWithFixWeight, CSignalCombineFromOtherSignalsWithDynWeight
+            from signals.signals_cls_optimizer import CSignalOptimizerMinUtyCon, CSignalOptimizerMinUtyConTopN
+            from skyrim.whiterun import SetFontGreen
+
+            print(SetFontGreen(f"... trnWin = {trn_win:>2d}, lbd = {lbd:>6.2f}"))
+
+            # RAW FIX
+            signals = CSignalCombineFromOtherSignalsWithFixWeight(
+                src_signal_weight={_: 1 / size_raw for _ in selected_src_signal_ids_raw},
+                src_signal_ids=selected_src_signal_ids_raw, src_signal_dir=signals_hedge_test_dir, sig_id="raw_fix",
+                sig_save_dir=signals_portfolios_dir, calendar=calendar)
+            signals.main(run_mode, bgn_date, stp_date)
+
+            # NEU FIX
+            signals = CSignalCombineFromOtherSignalsWithFixWeight(
+                src_signal_weight={_: 1 / size_neu for _ in selected_src_signal_ids_neu},
+                src_signal_ids=selected_src_signal_ids_neu, src_signal_dir=signals_hedge_test_dir, sig_id="neu_fix",
+                sig_save_dir=signals_portfolios_dir, calendar=calendar)
+            signals.main(run_mode, bgn_date, stp_date)
+
+            # RAW DYN
+            optimizer = CSignalOptimizerMinUtyCon(
+                save_id="raw_min_uty_con", src_signal_ids=selected_src_signal_ids_raw,
+                weight_bounds=(1 / size_raw / 2, 2 / size_raw), total_pos_lim=(0, 1), maxiter=10000,
+                trn_win=trn_win, min_model_days=min_model_days, lbd=lbd,
+                simu_test_dir=simulations_hedge_test_dir, optimized_dir=signals_optimized_dir,
+                calendar=calendar)
+            optimizer.main(run_mode, bgn_date, stp_date)
+            signal_weight_df = optimizer.get_signal_weight(bgn_date, stp_date)
+            signals = CSignalCombineFromOtherSignalsWithDynWeight(
+                src_signal_weight=signal_weight_df,
+                src_signal_ids=selected_src_signal_ids_raw, src_signal_dir=signals_hedge_test_dir, sig_id="raw_min_uty_con",
+                sig_save_dir=signals_portfolios_dir, calendar=calendar)
+            signals.main(run_mode, bgn_date, stp_date)
+
+            # NEU DYN
+            optimizer = CSignalOptimizerMinUtyCon(
+                save_id="neu_min_uty_con", src_signal_ids=selected_src_signal_ids_neu,
+                weight_bounds=(1 / size_neu / 2, 2 / size_neu), total_pos_lim=(0, 1), maxiter=10000,
+                trn_win=trn_win, min_model_days=min_model_days, lbd=lbd,
+                simu_test_dir=simulations_hedge_test_dir, optimized_dir=signals_optimized_dir,
+                calendar=calendar)
+            optimizer.main(run_mode, bgn_date, stp_date)
+            signal_weight_df = optimizer.get_signal_weight(bgn_date, stp_date)
+            signals = CSignalCombineFromOtherSignalsWithDynWeight(
+                src_signal_weight=signal_weight_df,
+                src_signal_ids=selected_src_signal_ids_neu, src_signal_dir=signals_hedge_test_dir, sig_id="neu_min_uty_con",
+                sig_save_dir=signals_portfolios_dir, calendar=calendar)
+            signals.main(run_mode, bgn_date, stp_date)
+
+            # # RAW DYN TOP
+            # optimizer = CSignalOptimizerMinUtyConTopN(
+            #     top_n=dyn_top_n, factors_classification=factors_classification, default_src_signal_ids=selected_src_signal_ids_raw,
+            #     save_id="raw_min_uty_con_top", src_signal_ids=src_signal_ids_raw,
+            #     weight_bounds=(1 / dyn_top_n / 2, 2 / dyn_top_n), total_pos_lim=(0, 1), maxiter=10000,
+            #     trn_win=trn_win, min_model_days=min_model_days, lbd=lbd,
+            #     simu_test_dir=simulations_hedge_test_dir, optimized_dir=signals_optimized_dir,
+            #     calendar=calendar)
+            # optimizer.main(run_mode, bgn_date, stp_date)
+            # signal_weight_df = optimizer.get_signal_weight(bgn_date, stp_date)
+            # src_signal_ids = signal_weight_df.columns.tolist()
+            # signals = CSignalCombineFromOtherSignalsWithDynWeight(
+            #     src_signal_weight=signal_weight_df,
+            #     src_signal_ids=src_signal_ids, src_signal_dir=signals_hedge_test_dir, sig_id="raw_min_uty_con_top",
+            #     sig_save_dir=signals_portfolios_dir, calendar=calendar)
+            # signals.main(run_mode, bgn_date, stp_date)
+            #
+            # # NEU DYN TOP
+            # optimizer = CSignalOptimizerMinUtyConTopN(
+            #     top_n=dyn_top_n, factors_classification=factors_classification,
+            #     save_id="neu_min_uty_con_top", src_signal_ids=src_signal_ids_neu, default_src_signal_ids=selected_src_signal_ids_neu,
+            #     weight_bounds=(1 / dyn_top_n / 2, 2 / dyn_top_n), total_pos_lim=(0, 1), maxiter=10000,
+            #     trn_win=trn_win, min_model_days=min_model_days, lbd=lbd,
+            #     simu_test_dir=simulations_hedge_test_dir, optimized_dir=signals_optimized_dir,
+            #     calendar=calendar)
+            # optimizer.main(run_mode, bgn_date, stp_date)
+            # signal_weight_df = optimizer.get_signal_weight(bgn_date, stp_date)
+            # src_signal_ids = signal_weight_df.columns.tolist()
+            # signals = CSignalCombineFromOtherSignalsWithDynWeight(
+            #     src_signal_weight=signal_weight_df,
+            #     src_signal_ids=src_signal_ids, src_signal_dir=signals_hedge_test_dir, sig_id="neu_min_uty_con_top",
+            #     sig_save_dir=signals_portfolios_dir, calendar=calendar)
+            # signals.main(run_mode, bgn_date, stp_date)
+
+    elif switch in ["SIMU"]:
+        from simulations.simulation_cls import cal_simulations_mp
+        from setup_project import futures_by_instrument_dir, major_return_db_name
+
+        if sig_type == "HEDGE-MA":
+            import itertools as ittl
+            from setup_project import signals_hedge_test_dir, simulations_hedge_test_dir
+            from config_factor import factors_raw, factors_neu
+            from config_portfolio import uni_props, mov_ave_wins, cost_rate_hedge_test
+
+            sig_ids = [f"{sid}_UHP{int(uni_prop * 10):02d}_MA{mov_ave_win:02d}"
+                       for sid, uni_prop, mov_ave_win in ittl.product(factors_raw + factors_neu, uni_props, mov_ave_wins)]
+            cal_simulations_mp(
+                proc_num=proc_num,
+                sig_ids=sig_ids, test_bgn_date=bgn_date, test_stp_date=stp_date,
+                cost_rate=cost_rate_hedge_test, test_universe=concerned_instruments_universe,
+                signals_dir=signals_hedge_test_dir, simulations_dir=simulations_hedge_test_dir,
+                futures_by_instrument_dir=futures_by_instrument_dir, major_return_db_name=major_return_db_name,
+                calendar=calendar, tips="Simulation for hedge-test factors with MA"
+            )
+
+        elif sig_type == "PORTFOLIO":
+            from setup_project import signals_portfolios_dir, simulations_portfolios_dir
+            from config_portfolio import test_portfolio_ids, cost_rate_portfolios
+
+            cal_simulations_mp(
+                proc_num=proc_num,
+                sig_ids=test_portfolio_ids, test_bgn_date=bgn_date, test_stp_date=stp_date,
+                cost_rate=cost_rate_portfolios, test_universe=concerned_instruments_universe,
+                signals_dir=signals_portfolios_dir, simulations_dir=simulations_portfolios_dir,
+                futures_by_instrument_dir=futures_by_instrument_dir, major_return_db_name=major_return_db_name,
+                calendar=calendar, tips="Simulation for portfolios"
+            )
+    elif switch in ["EVAL"]:
+        from config_portfolio import risk_free_rate, performance_indicators, test_portfolio_ids
+
+        if sig_type == "HEDGE-MA":
+            from setup_project import simulations_hedge_test_dir, evaluations_hedge_test_dir
+            from config_factor import factors_raw, factors_neu, factors_classification
+            from config_portfolio import uni_props, mov_ave_wins, selected_raw_factors_and_uni_prop_ma, selected_neu_factors_and_uni_prop_ma
+            from simulations.evaluations_cls import eval_hedge_ma_mp, concat_eval_ma_results, plot_selected_factors_and_uni_prop_ma
+
+            eval_hedge_ma_mp(proc_num=proc_num,
+                             factors=factors_raw, factors_neutral=factors_neu, uni_props=uni_props, mov_ave_wins=mov_ave_wins,
+                             factors_classification=factors_classification,
+                             indicators=performance_indicators,
+                             simu_save_dir=simulations_hedge_test_dir,
+                             eval_save_dir=evaluations_hedge_test_dir,
+                             annual_risk_free_rate=risk_free_rate
+                             )
+            concat_eval_ma_results(uni_props, mov_ave_wins, evaluations_hedge_test_dir)
+            plot_selected_factors_and_uni_prop_ma(selected_raw_factors_and_uni_prop_ma, "RAW", simulations_hedge_test_dir, evaluations_hedge_test_dir)
+            plot_selected_factors_and_uni_prop_ma(selected_neu_factors_and_uni_prop_ma, "NEU", simulations_hedge_test_dir, evaluations_hedge_test_dir)
+
+        elif sig_type == "PORTFOLIO":
+            from setup_project import simulations_portfolios_dir, evaluations_portfolios_dir
+            from simulations.evaluations_cls import CEvaluationPortfolio
+
+            evaluator = CEvaluationPortfolio(
+                eval_id="portfolios", simu_ids=test_portfolio_ids,
+                indicators=performance_indicators, simu_save_dir=simulations_portfolios_dir,
+                eval_save_dir=evaluations_portfolios_dir, annual_risk_free_rate=0,
+            )
+            evaluator.main(True)
 
     else:
         print(f"... switch = {switch} is not a legal option, please check again.")

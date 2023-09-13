@@ -66,8 +66,12 @@ class CSignalCombineFromOtherSignalsWithDynWeight(CSignalCombineFromOtherSignals
         sum_weight_df = pd.DataFrame()
         for src_signal_id in self.src_signal_ids:
             sig_df = self.src_signals_dfs[src_signal_id]
-            sig_wgt = selected_weight_df[src_signal_id]  # type = pd.Series
-            sum_weight_df = sum_weight_df.add(sig_df.multiply(sig_wgt, axis=0).fillna(0), fill_value=0)
+            try:
+                sig_wgt = selected_weight_df[src_signal_id]  # type = pd.Series
+            except KeyError:
+                sig_wgt = 0  # type = int
+            dlt_wgt = sig_df.multiply(sig_wgt, axis=0).fillna(0)
+            sum_weight_df = sum_weight_df.add(dlt_wgt, fill_value=0)
         sum_weight_df_norm = self.normalize_final_weight(sum_weight_df)
         update_df = sum_weight_df_norm.stack(dropna=False).reset_index()
         return update_df

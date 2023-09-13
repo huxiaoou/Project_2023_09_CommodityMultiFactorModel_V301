@@ -1,9 +1,4 @@
-"""
-created @ 2023-07-31
-0.
-"""
-
-#
+# begin date for argument bgn in main.py
 bgn_dates_in_overwrite_mod = {
     "IR": "20120101",  # instrument_return
     "AU": "20120301",  # available_universe

@@ -102,8 +102,12 @@ class CSignalOptimizer(object):
         self.calendar = calendar
 
         self.signal_simu_ret_df = pd.DataFrame()
-        self.default_weights = pd.Series(data=1 / self.src_signal_qty, index=self.src_signal_ids)
         self.optimized_struct = get_signal_optimized_lib_struct(save_id)
+        self._init_default_weights()
+
+    def _init_default_weights(self):
+        self.default_weights = pd.Series(data=1 / self.src_signal_qty, index=self.src_signal_ids)
+        return 0
 
     def __get_optimized_lib_reader(self) -> CManagerLibReader:
         lib_reader = CManagerLibReader(self.optimized_dir, self.optimized_struct.m_lib_name)
@@ -142,9 +146,8 @@ class CSignalOptimizer(object):
             train_dates.append((__train_end_month, __train_bgn_date, __train_end_date))
         return train_dates
 
-    def __get_selected_ret_df(self, bgn_date: str, end_date: str) -> pd.DataFrame:
-        filter_dates = (self.signal_simu_ret_df.index >= bgn_date) & (self.signal_simu_ret_df.index <= end_date)
-        return self.signal_simu_ret_df.loc[filter_dates]
+    def _get_selected_ret_df(self, train_bgn_date: str, train_end_date: str) -> pd.DataFrame:
+        return self.signal_simu_ret_df.truncate(before=train_bgn_date, after=train_end_date)
 
     def _optimize(self, mu: pd.Series, sgm: pd.DataFrame) -> (np.ndarray, float):
         pass
@@ -163,7 +166,7 @@ class CSignalOptimizer(object):
                 _a = 240
                 model_data = {}
                 for train_end_month, train_bgn_date, train_end_date in train_dates:
-                    ret_df = self.__get_selected_ret_df(train_bgn_date, train_end_date)
+                    ret_df = self._get_selected_ret_df(train_bgn_date, train_end_date)
                     if len(ret_df) < self.min_model_days:
                         ws = self.default_weights
                     else:
@@ -171,7 +174,7 @@ class CSignalOptimizer(object):
                         w, _ = self._optimize(mu, sgm)
                         ws = pd.Series(data=w, index=mu.index)
                     model_data[train_end_date] = ws
-                optimized_df = pd.DataFrame.from_dict(model_data, orient="index")
+                optimized_df = pd.DataFrame.from_dict(model_data, orient="index").fillna(0)
                 update_df = optimized_df.stack(dropna=False).reset_index()
                 self.__save(update_df, run_mode)
         return 0
@@ -212,13 +215,29 @@ class CSignalOptimizerMinUtyCon(CSignalOptimizerMinUty):
                                     maxiter=self.maxiter)
 
 
-class CSignalOptimizerMinNegSharpe(CSignalOptimizer):
-    def __init__(self, weight_bounds: tuple[float, float], maxiter: int, **kwargs):
-        self.weight_bounds = weight_bounds
-        self.maxiter = maxiter
+class CSignalOptimizerMinUtyConTopN(CSignalOptimizerMinUtyCon):
+    def _init_default_weights(self):
+        self.default_weights = pd.Series(data=1 / self.default_src_signal_qty, index=self.default_src_signal_ids)
+        return 0
+
+    def __init__(self, top_n: int, factors_classification: dict[str, tuple[str, str]], default_src_signal_ids: list[str], **kwargs):
+        self.top_n = top_n
+        self.factors_classification = factors_classification
+        self.default_src_signal_ids, self.default_src_signal_qty = default_src_signal_ids, len(default_src_signal_ids)
         super().__init__(**kwargs)
 
-    def _optimize(self, mu: pd.Series, sgm: pd.DataFrame) -> (np.ndarray, float):
-        return minimize_neg_sharpe(mu=mu.values, sigma=sgm.values,
-                                   bounds=self.weight_bounds,
-                                   maxiter=self.maxiter)
+    def _get_selected_ret_df(self, train_bgn_date: str, train_end_date: str) -> pd.DataFrame:
+        all_src_sig_ret_df = super()._get_selected_ret_df(train_bgn_date, train_end_date)
+        mu, sd = all_src_sig_ret_df.mean(), all_src_sig_ret_df.std()
+        sharpe: pd.Series = mu / sd * np.sqrt(250)
+        class_data = {f: self.factors_classification[f.split("_")[0]] for f in sharpe.index}
+        sharpe_by_class_df = pd.DataFrame({
+            "sharpe": sharpe,
+            "class": class_data
+        })
+        sharpe_by_class_df.sort_values(by=["class", "sharpe"], ascending=[True, False], inplace=True)
+        sharpe_by_class_df.reset_index(inplace=True)
+        top_sharpe_for_each_class_df = sharpe_by_class_df.groupby(by="class").apply(lambda _: _.iloc[0])
+        top_sharpe_for_each_class_df.sort_values(by="sharpe", ascending=False, inplace=True)
+        top_src_ids = top_sharpe_for_each_class_df.head(self.top_n)["index"].tolist()
+        return all_src_sig_ret_df[top_src_ids]
