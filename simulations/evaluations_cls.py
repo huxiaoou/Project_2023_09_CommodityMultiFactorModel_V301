@@ -144,8 +144,8 @@ def concat_eval_ma_results(uni_props: tuple[float], mov_ave_wins: tuple[int], ev
 
     raw_df_concat = pd.concat(raw_dfs, axis=0, ignore_index=True).sort_values(by=["factor", "sharpe_ratio"], ascending=[True, False])
     neu_df_concat = pd.concat(neu_dfs, axis=0, ignore_index=True).sort_values(by=["factor", "sharpe_ratio"], ascending=[True, False])
-    raw_concat_file = os.path.join(eval_save_dir, "eval-factors_raw-concat-ma.csv")
-    neu_concat_file = os.path.join(eval_save_dir, "eval-factors_neu-concat-ma.csv")
+    raw_concat_file = os.path.join(eval_save_dir, "eval-factors_raw-concat.csv")
+    neu_concat_file = os.path.join(eval_save_dir, "eval-factors_neu-concat.csv")
     raw_df_concat.to_csv(raw_concat_file, index=False, float_format="%.2f")
     neu_df_concat.to_csv(neu_concat_file, index=False, float_format="%.2f")
     return 0

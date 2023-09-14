@@ -66,22 +66,39 @@ selected_raw_factors_and_uni_prop_ma = (
 )
 
 selected_neu_factors_and_uni_prop_ma = (
-    ("CTP120", 0.4, 5),
     ("CSP120", 0.4, 5),
-    ("CVP120", 0.2, 15),
-    ("CVP180LD060", 0.4, 15),
-    ("CTP240LD060", 0.4, 5),
+    ("CTP120", 0.4, 5),
+    ("CVP120", 0.4, 15),
     ("CSP180LD020", 0.4, 5),
-    ("SKEW010LD060", 0.4, 5),
+    ("CTP240LD060", 0.4, 5),
+    ("CVP180LD060", 0.4, 15),
     ("SKEW010", 0.2, 5),
+    ("SKEW010LD060", 0.4, 5),
     ("SKEW180LD020", 0.4, 15),
     ("BASISA060", 0.3, 5),
-    ("NETDOIWLD240", 0.4, 5),
-    ("NETDOIBD010", 0.4, 15),
     ("RSBR020", 0.4, 15),
     ("RSLR240", 0.4, 15),
-)
+    ("NETDOIWA020", 0.3, 5),
+    ("NETDOIWBD180", 0.3, 10),
 
+    # --- V300 version, best when trn_win = 3, lbd = 20
+    # from 20150701 to 20230801
+    # ("CSP120", 0.4, 5),
+    # ("CTP120", 0.4, 5),
+    # ("CVP120", 0.2, 15),
+    # ("CSP180LD020", 0.4, 15),
+    # ("CTP180LD060", 0.4, 5),
+    # ("CVP180LD060", 0.4, 15),
+    # ("SKEW010", 0.2, 5),
+    # ("SKEW010LD060", 0.4, 5),
+    # ("SKEW180LD020", 0.2, 5),
+    # ("BASISA060", 0.4, 15),
+    # ("RSBR240", 0.4, 5),
+    # ("RSLR240", 0.4, 5),
+    # ("NETDOIWA020", 0.3, 5),
+    # ("NETDOIWBD180", 0.2, 15),
+
+)
 src_signal_ids_raw = [f"{fac}_UHP{int(uhp * 10):02d}_MA{maw:02d}" for fac, uhp, maw in ittl.product(factors_raw, uni_props, mov_ave_wins)]
 src_signal_ids_neu = [f"{fac}_UHP{int(uhp * 10):02d}_MA{maw:02d}" for fac, uhp, maw in ittl.product(factors_neu, uni_props, mov_ave_wins)]
 selected_src_signal_ids_raw = [f"{fac}_UHP{int(uhp * 10):02d}_MA{maw:02d}" for fac, uhp, maw in selected_raw_factors_and_uni_prop_ma]
@@ -90,7 +107,7 @@ size_raw = len(selected_src_signal_ids_raw)
 size_neu = len(selected_src_signal_ids_neu)
 
 trn_win, lbd = 3, 20  # optimized
-# trn_win, lbd = 1, 20  # test
+# trn_win, lbd = 3, 20  # test
 min_model_days = int(trn_win * 20 * 0.9)
 dyn_top_n = 20
 test_portfolio_ids = [

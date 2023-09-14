@@ -393,7 +393,9 @@ if __name__ == "__main__":
         from setup_project import factors_exposure_raw_dir, factors_exposure_neu_dir, factors_exposure_cor_dir
         from factors.factors_exposure_corr import cal_factors_exposure_corr
 
-        test_factor_list_l = ["CTP120", "CSP120", "CVP120", "CSP180LD020"]
+        # test_factor_list_l = ["CTP120", "CSP120", "CVP120", "CSP180LD020"]
+        # test_factor_list_l = ["MTM", "NETDOIWLD240"]
+        test_factor_list_l = ["RSBR020", "RSBR240", "RSLR240"]
         test_factor_list_r = []
         test_neutral_tag = ["RAW", "NEU"][0]
 
@@ -517,7 +519,6 @@ if __name__ == "__main__":
             #     src_signal_ids=src_signal_ids, src_signal_dir=signals_hedge_test_dir, sig_id="neu_min_uty_con_top",
             #     sig_save_dir=signals_portfolios_dir, calendar=calendar)
             # signals.main(run_mode, bgn_date, stp_date)
-
     elif switch in ["SIMU"]:
         from simulations.simulation_cls import cal_simulations_mp
         from setup_project import futures_by_instrument_dir, major_return_db_name
@@ -542,7 +543,9 @@ if __name__ == "__main__":
         elif sig_type == "PORTFOLIO":
             from setup_project import signals_portfolios_dir, simulations_portfolios_dir
             from config_portfolio import test_portfolio_ids, cost_rate_portfolios
+            from skyrim.whiterun import SetFontGreen
 
+            print(f"... simu bgn_date = {SetFontGreen(bgn_date)}")
             cal_simulations_mp(
                 proc_num=proc_num,
                 sig_ids=test_portfolio_ids, test_bgn_date=bgn_date, test_stp_date=stp_date,
