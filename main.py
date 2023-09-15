@@ -464,6 +464,7 @@ if __name__ == "__main__":
                 simu_test_dir=simulations_hedge_test_dir, optimized_dir=signals_optimized_dir,
                 calendar=calendar)
             optimizer.main(run_mode, bgn_date, stp_date)
+            optimizer.plot_optimized_weight(reduced=True)
             signal_weight_df = optimizer.get_signal_weight(bgn_date, stp_date)
             signals = CSignalCombineFromOtherSignalsWithDynWeight(
                 src_signal_weight=signal_weight_df,
@@ -479,6 +480,7 @@ if __name__ == "__main__":
                 simu_test_dir=simulations_hedge_test_dir, optimized_dir=signals_optimized_dir,
                 calendar=calendar)
             optimizer.main(run_mode, bgn_date, stp_date)
+            optimizer.plot_optimized_weight(reduced=True)
             signal_weight_df = optimizer.get_signal_weight(bgn_date, stp_date)
             signals = CSignalCombineFromOtherSignalsWithDynWeight(
                 src_signal_weight=signal_weight_df,
@@ -585,6 +587,9 @@ if __name__ == "__main__":
                 eval_save_dir=evaluations_portfolios_dir, annual_risk_free_rate=0,
             )
             evaluator.main(True)
+            evaluator.eval_by_year()
+            evaluator.plot_nav()
+            evaluator.plot_nav_by_year()
 
     else:
         print(f"... switch = {switch} is not a legal option, please check again.")

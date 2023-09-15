@@ -76,6 +76,7 @@ selected_neu_factors_and_uni_prop_ma = (
     ("SKEW010LD060", 0.4, 5),
     ("SKEW180LD020", 0.4, 15),
     ("BASISA060", 0.3, 5),
+    ("TSBD010", 0.4, 15),
     ("RSBR020", 0.4, 15),
     ("RSLR240", 0.4, 15),
     ("NETDOIWA020", 0.3, 5),
@@ -112,8 +113,8 @@ min_model_days = int(trn_win * 20 * 0.9)
 dyn_top_n = 20
 test_portfolio_ids = [
     "raw_fix",
-    "neu_fix",
     "raw_min_uty_con",
+    "neu_fix",
     "neu_min_uty_con",
     # "raw_min_uty_con_top",
     # "neu_min_uty_con_top",

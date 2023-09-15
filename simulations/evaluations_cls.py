@@ -19,10 +19,22 @@ class CEvaluation(object):
         self.annual_risk_free_rate = annual_risk_free_rate
         self.eval_id = eval_id
 
-    def __get_performance_evaluation(self, simu_id: str) -> dict:
+    def __get_nav_df(self, simu_id) -> pd.DataFrame:
         simu_nav_file = f"nav-{simu_id}.csv.gz"
         simu_nav_path = os.path.join(self.simu_save_dir, simu_nav_file)
         simu_nav_df = pd.read_csv(simu_nav_path, dtype={"trade_date": str}).set_index("trade_date")
+        return simu_nav_df
+
+    def __get_portfolio_net_ret(self) -> pd.DataFrame:
+        portfolios_net_ret_data = {}
+        for simu_id in self.simu_ids:
+            nav_df = self.__get_nav_df(simu_id)
+            portfolios_net_ret_data[simu_id] = nav_df["netRet"]
+        portfolios_net_ret_df = pd.DataFrame(portfolios_net_ret_data)
+        return portfolios_net_ret_df
+
+    def __get_performance_evaluation(self, simu_id: str) -> dict:
+        simu_nav_df = self.__get_nav_df(simu_id)
         nav = CNAV(t_raw_nav_srs=simu_nav_df["netRet"], t_annual_rf_rate=self.annual_risk_free_rate, t_type="RET")
         nav.cal_all_indicators(t_method="linear")
         return nav.to_dict(t_type="eng")
@@ -53,6 +65,43 @@ class CEvaluation(object):
             res_data.append(res)
         self.__save(res_data, printout)
         print(f"... @ {SetFontGreen(f'{dt.datetime.now()}')} nav evaluation for {SetFontGreen(self.eval_id)} calculated")
+        return 0
+
+    def plot_nav(self):
+        portfolios_net_ret_df = self.__get_portfolio_net_ret()
+        portfolios_nav_df = (portfolios_net_ret_df + 1).cumprod()
+        plot_lines(t_plot_df=portfolios_nav_df, t_fig_name=f"portfolios_nav",
+                   t_save_dir=self.eval_save_dir, t_tick_label_size=16)
+        return 0
+
+    def plot_nav_by_year(self):
+        portfolios_net_ret_df = self.__get_portfolio_net_ret()
+        portfolios_net_ret_df["trade_year"] = portfolios_net_ret_df.index.map(lambda _: _[0:4])
+        for trade_year, trade_year_df in portfolios_net_ret_df.groupby(by="trade_year"):
+            trade_year_ret = trade_year_df.drop("trade_year", axis=1)
+            trade_year_nav = (trade_year_ret + 1).cumprod()
+            plot_lines(t_plot_df=trade_year_nav, t_fig_name=f"portfolios_nav_{trade_year}",
+                       t_save_dir=self.eval_save_dir, t_tick_label_size=16)
+        return 0
+
+    def eval_by_year(self, printout: bool = False):
+        summary_data = {simu_id: {} for simu_id in self.simu_ids}
+        portfolios_net_ret_df = self.__get_portfolio_net_ret()
+        portfolios_net_ret_df["trade_year"] = portfolios_net_ret_df.index.map(lambda _: _[0:4])
+        for trade_year, trade_year_df in portfolios_net_ret_df.groupby(by="trade_year"):
+            for simu_id in self.simu_ids:
+                portfolio_trade_year_ret = trade_year_df[simu_id]
+                nav = CNAV(portfolio_trade_year_ret, t_annual_rf_rate=self.annual_risk_free_rate,
+                           t_type="RET")
+                nav.cal_all_indicators()
+                summary_data[simu_id][trade_year] = nav.to_dict(t_type="eng")
+        for simu_id, simu_id_data in summary_data.items():
+            summary_df = pd.DataFrame.from_dict(simu_id_data, orient="index")
+            summary_file = f"eval-portfolios-by-year-{simu_id}.csv"
+            summary_path = os.path.join(self.eval_save_dir, summary_file)
+            summary_df[self.indicators].to_csv(summary_path, index_label="tradeYear", float_format="%.2f")
+            if printout:
+                print(summary_df[self.indicators])
         return 0
 
 

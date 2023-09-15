@@ -3,6 +3,7 @@ import warnings
 import numpy as np
 import pandas as pd
 from skyrim.whiterun import CCalendarMonthly
+from skyrim.winterhold2 import CPlotBars
 from skyrim.falkreath import CManagerLibReader, CManagerLibWriter
 from scipy.optimize import minimize, NonlinearConstraint, LinearConstraint
 from struct_lib.portfolios import get_signal_optimized_lib_struct
@@ -87,32 +88,56 @@ def minimize_neg_sharpe(mu: np.ndarray, sigma: np.ndarray,
         return None, None
 
 
-class CSignalOptimizer(object):
-    def __init__(self, save_id: str, src_signal_ids: list,
-                 trn_win: int, min_model_days: int,
-                 simu_test_dir: str, optimized_dir: str,
-                 calendar: CCalendarMonthly):
+class CSignalOptimizerReader(object):
+    def __init__(self, save_id: str, optimized_dir: str):
         self.save_id = save_id
+        self.optimized_dir = optimized_dir
+        self.optimized_struct = get_signal_optimized_lib_struct(save_id)
+
+    def _get_optimized_lib_reader(self) -> CManagerLibReader:
+        lib_reader = CManagerLibReader(self.optimized_dir, self.optimized_struct.m_lib_name)
+        lib_reader.set_default(self.optimized_struct.m_tab.m_table_name)
+        return lib_reader
+
+    def plot_optimized_weight(self, reduced: bool = False):
+        lib_reader = self._get_optimized_lib_reader()
+        optimized_df = lib_reader.read(t_value_columns=["trade_date", "signal", "value"])
+        monthly_df = pd.pivot_table(data=optimized_df, index="trade_date", columns="signal", values="value")
+        monthly_df.fillna(0, inplace=True)
+        if reduced:
+            reduced_mapper = {z: z.split("_")[0] for z in monthly_df.columns}
+            monthly_df.rename(mapper=reduced_mapper, axis=1, inplace=True)
+
+        artist = CPlotBars(
+            plot_df=monthly_df, stacked=True, colormap="jet",
+            fig_name=f"optimized_weight_{self.save_id}", fig_save_dir=self.optimized_dir,
+            xtick_spread=3, xtick_label_size=16, ytick_label_size=16, xtick_label_rotation=90,
+        )
+        artist.plot()
+        return 0
+
+
+class CSignalOptimizer(CSignalOptimizerReader):
+    def __init__(self, src_signal_ids: list,
+                 trn_win: int, min_model_days: int,
+                 simu_test_dir: str,
+                 calendar: CCalendarMonthly,
+                 **kwargs):
+        super().__init__(**kwargs)
+
         self.src_signal_ids, self.src_signal_qty = src_signal_ids, len(src_signal_ids)
         self.trn_win = trn_win
         self.min_model_days = min_model_days
 
         self.simu_test_dir = simu_test_dir
-        self.optimized_dir = optimized_dir
         self.calendar = calendar
 
         self.signal_simu_ret_df = pd.DataFrame()
-        self.optimized_struct = get_signal_optimized_lib_struct(save_id)
         self._init_default_weights()
 
     def _init_default_weights(self):
         self.default_weights = pd.Series(data=1 / self.src_signal_qty, index=self.src_signal_ids)
         return 0
-
-    def __get_optimized_lib_reader(self) -> CManagerLibReader:
-        lib_reader = CManagerLibReader(self.optimized_dir, self.optimized_struct.m_lib_name)
-        lib_reader.set_default(self.optimized_struct.m_tab.m_table_name)
-        return lib_reader
 
     def __get_optimized_lib_writer(self, run_mode: str) -> CManagerLibWriter:
         lib_writer = CManagerLibWriter(self.optimized_dir, self.optimized_struct.m_lib_name)
@@ -121,7 +146,7 @@ class CSignalOptimizer(object):
 
     def __check_continuity(self, run_mode: str, append_month: str):
         if run_mode in ["A"]:
-            lib_reader = self.__get_optimized_lib_reader()
+            lib_reader = self._get_optimized_lib_reader()
             res = lib_reader.check_continuity_monthly(append_month, self.calendar)
             lib_reader.close()
             return res
@@ -181,7 +206,7 @@ class CSignalOptimizer(object):
 
     def get_signal_weight(self, bgn_date: str, stp_date: str) -> pd.DataFrame:
         header = pd.DataFrame({"trade_date": self.calendar.get_iter_list(bgn_date, stp_date, True)})
-        lib_reader = self.__get_optimized_lib_reader()
+        lib_reader = self._get_optimized_lib_reader()
         optimized_df = lib_reader.read_by_conditions(t_conditions=[
             ("trade_date", ">=", bgn_date),
             ("trade_date", "<", stp_date),
